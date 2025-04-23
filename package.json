@@ -1,0 +1,32 @@
+{
+  "scripts": {
+    "start": "ts-node src/index.ts"
+  },
+  "dependencies": {
+    "connect-flash": "^0.1.1",
+    "ejs-mate": "^4.0.0",
+    "express": "^5.1.0",
+    "express-mongo-sanitize": "^2.2.0",
+    "express-session": "^1.18.1",
+    "helmet": "^8.1.0",
+    "method-override": "^3.0.0",
+    "mongoose": "^8.13.2",
+    "passport": "^0.7.0",
+    "passport-local": "^1.0.0",
+    "retell-sdk": "^4.27.0"
+  },
+  "devDependencies": {
+    "@types/connect-flash": "^0.0.40",
+    "@types/express": "^5.0.1",
+    "@types/express-mongo-sanitize": "^2.1.2",
+    "@types/express-session": "^1.18.1",
+    "@types/helmet": "^4.0.0",
+    "@types/method-override": "^3.0.0",
+    "@types/mongoose": "^5.11.97",
+    "@types/node": "^22.14.1",
+    "@types/passport": "^1.0.17",
+    "@types/passport-local": "^1.0.38",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.8.3"
+  }
+}
