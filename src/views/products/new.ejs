@@ -1,0 +1,25 @@
+<% layout('layouts/boilerplate') %>
+
+    <div class="container mt-3">
+        <h1 class="text-center">새 상품 추가 페이지</h1>
+        <form action="/products" method="POST">
+            <div class="form-group mt-2">
+                <label for="name">상품명</label>
+                <input type="text" class="form-control" id="name" name="product[name]" required>
+            </div>
+
+            <div class="form-group mt-2">
+                <label for="price">가격</label>
+                <input type="number" class="form-control" id="price" name="product[price]" required>
+            </div>
+
+            <div class="form-group mt-2">
+                <label for="quantity">현재 수량</label>
+                <input type="number" class="form-control" id="quantity" name="product[quantity]" required min="0">
+            </div>
+
+            <div class="d-flex justify-content-end">
+                <button type="submit" class="btn btn-primary mt-3">상품 추가 완료</button>
+            </div>        
+        </form>
+    </div>

@@ -1,0 +1,104 @@
+<% layout('layouts/boilerplate') %>
+<div class="container d-flex justify-content-center align-items-center mt-3">
+    <div class="row">
+        <div class="col-md-6 offset-md-3 col-xl-4 offset-xl-4">
+            <div class="card shadow mb-3">
+                <img src="https://images.unsplash.com/photo-1520453803296-c39eabe2dab4?q=80&w=1725&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" alt="" class="card-img-top" />
+                <div class="card-body">
+                    <h5 class="card-title">회원가입</h5>
+                    <form id="registerForm" method="POST" novalidate>
+                        <!-- 핸드폰 번호 -->
+                        <div class="mb-3">
+                            <label class="form-label" for="phonenum">핸드폰 번호 ( - 하이픈 없이 번호만 입력 )</label>
+                            <input
+                                type="text"
+                                id="phonenum"
+                                name="phonenum"
+                                class="form-control"
+                                required
+                            />
+                        </div>
+
+                        <!-- 비밀번호 -->
+                        <div class="mb-3">
+                            <label class="form-label" for="password">비밀번호</label>
+                            <input
+                                type="password"
+                                id="password"
+                                name="password"
+                                class="form-control"
+                                required
+                            />
+                        </div>
+
+                        <!-- 비밀번호 확인 -->
+                        <div class="mb-3">
+                            <label class="form-label" for="confirmPassword">비밀번호 확인</label>
+                            <input
+                                type="password"
+                                id="confirmPassword"
+                                name="confirmPassword"
+                                class="form-control"
+                                required
+                            />
+                        </div>
+
+                        <!-- 제출 버튼 -->
+                        <button type="submit" class="btn btn-success w-100">회원가입</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const form = document.getElementById("registerForm");
+        const phoneInput = document.getElementById("phonenum");
+        const passwordInput = document.getElementById("password");
+        const confirmPasswordInput = document.getElementById("confirmPassword");
+
+        // 전화번호 입력 시 하이픈 자동 추가
+        phoneInput.addEventListener("input", function (e) {
+            let x = e.target.value.replace(/\D/g, "").match(/(\d{0,3})(\d{0,4})(\d{0,4})/);
+            e.target.value = !x[2] ? x[1] : "010-" + x[2] + (x[3] ? "-" + x[3] : "");
+        });
+
+        // 폼 제출 이벤트 처리
+        form.addEventListener("submit", function (e) {
+            e.preventDefault(); // 기본 제출 동작 방지
+
+            // 전화번호 유효성 검사 (11자리 숫자)
+            const phoneValue = phoneInput.value.replace(/-/g, ""); // 하이픈 제거
+            if (phoneValue.length !== 11 || isNaN(phoneValue)) {
+                Swal.fire({
+                    icon: "error",
+                    title: "유효하지 않은 전화번호",
+                    text: "전화번호는 11자리 숫자여야 합니다.",
+                });
+                return;
+            }
+
+            // 비밀번호와 비밀번호 확인 대조
+            if (passwordInput.value !== confirmPasswordInput.value) {
+                Swal.fire({
+                    icon: "error",
+                    title: "비밀번호 불일치",
+                    text: "비밀번호와 비밀번호 확인이 일치하지 않습니다.",
+                });
+                return;
+            }
+
+            // 모든 검사가 통과되었을 경우 성공 메시지 표시
+            Swal.fire({
+                icon: "success",
+                title: "회원가입 성공",
+                text: "회원가입이 완료되었습니다!",
+            }).then(() => {
+                form.submit(); // 실제 폼 제출
+            });
+        });
+    });
+</script>

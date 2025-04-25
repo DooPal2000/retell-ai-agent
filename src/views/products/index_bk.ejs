@@ -1,0 +1,48 @@
+<% layout('layouts/boilerplate') %>
+
+    <div class="container">
+        <h1>All Posts</h1>
+        <div class="mb-3">
+            <a href="/postings/new" class="btn btn-primary">Add New Post</a>
+        </div>
+
+        <% if (!postings || postings.length===0) { %>
+            <!-- postings 배열이 없거나, 길이가 0일 경우 -->
+            <div class="alert alert-warning mt-4">
+                <p>No postings available yet. Be the first to add one!</p>
+                <a href="/postings/new" class="btn btn-success">Add New Post</a>
+            </div>
+            <% } else { %>
+                <!-- postings가 있을 때만 게시글 목록 출력 -->
+                <% for (let posting of postings) { %>
+                    <div class="card mb-3">
+                        <div class="row">
+                            <div class="col-md-4">
+                                <% if (posting.image) { %>
+                                    <img class="img-fluid" alt="<%= posting.title %>" src="<%= posting.image %>">
+                                    <% } else { %>
+                                        <img class="img-fluid" alt="No image available"
+                                            src="/path/to/default-image.jpg">
+                                        <% } %>
+                            </div>
+                            <div class="col-md-8">
+                                <div class="card-body">
+                                    <h5 class="card-title">
+                                        <%= posting.title %>
+                                    </h5>
+                                    <p class="card-text">
+                                        <%= posting.description ? posting.description.substring(0, 100) + '...' : '' %>
+                                    </p>
+                                    <p class="card-text">
+                                        <small class="text-muted">
+                                            <%= posting.location %>
+                                        </small>
+                                    </p>
+                                    <a class="btn btn-primary" href="/postings/<%= posting._id %>">View Post</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <% } %>
+                        <% } %>
+    </div>

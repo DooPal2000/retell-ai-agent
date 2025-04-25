@@ -1,0 +1,112 @@
+<% layout('layouts/boilerplate') %>
+
+
+<div class="container mt-5">
+    <h1 class="text-center">관리자 페이지 - 사용자 관리</h1>
+    <div class="table-responsive mt-4">
+        <table class="table table-bordered table-striped">
+            <thead class="table-dark">
+                <tr>
+                    <th>핸드폰 번호</th>
+                    <th>활성 상태</th>
+                    <th>관리</th>
+                </tr>
+            </thead>
+            <tbody>
+                <% users.forEach(user => { %>
+                    <tr>
+                        <td><%= formatPhoneNumber(user.phonenum) %></td>
+                        <td>
+                            <div class="form-check form-switch">
+                                <input 
+                                    class="form-check-input toggle-active" 
+                                    type="checkbox" 
+                                    id="toggle-<%= user._id %>" 
+                                    data-user-id="<%= user._id %>"
+                                    <%= user.isActive ? 'checked' : '' %> 
+                                >
+                                <label class="form-check-label" for="toggle-<%= user._id %>">
+                                    <%= user.isActive ? '활성화' : '비활성화' %>
+                                </label>
+                            </div>
+                        </td>
+                        <td>
+                            <button class="btn btn-danger btn-sm delete-user" data-user-id="<%= user._id %>">
+                                삭제
+                            </button>
+                        </td>
+                    </tr>
+                <% }) %>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        // 활성 상태 토글 처리
+        document.querySelectorAll('.toggle-active').forEach(toggle => {
+            toggle.addEventListener('change', function () {
+                const userId = this.dataset.userId;
+                const isActive = this.checked;
+                const label = this.nextElementSibling; // 체크박스 다음에 오는 label 요소
+
+                fetch(`/admin/toggle-active/${userId}`, {
+                    method: 'PATCH',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ isActive })
+                })
+                    .then(res => res.json())
+                    .then(data => {
+                        if (data.success) {
+                            label.textContent = isActive ? '활성화' : '비활성화';
+                            Swal.fire('성공', '활성 상태가 변경되었습니다.', 'success');
+                        } else {
+                            this.checked = !isActive; // 실패 시 토글 상태 되돌리기
+                            Swal.fire('실패', '상태 변경에 실패했습니다.', 'error');
+                        }
+                    })
+                    .catch(err => {
+                        this.checked = !isActive; // 에러 시 토글 상태 되돌리기
+                        Swal.fire('에러', '서버와의 통신에 실패했습니다.', 'error');
+                    });
+            });
+        });
+
+        // 사용자 삭제 처리
+        document.querySelectorAll('.delete-user').forEach(button => {
+            button.addEventListener('click', function () {
+                const userId = this.dataset.userId;
+
+                Swal.fire({
+                    title: '사용자를 삭제하시겠습니까?',
+                    text: '이 작업은 되돌릴 수 없습니다.',
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#d33',
+                    cancelButtonColor: '#3085d6',
+                    confirmButtonText: '삭제',
+                    cancelButtonText: '취소'
+                }).then(result => {
+                    if (result.isConfirmed) {
+                        fetch(`/admin/delete-user/${userId}`, { method: 'DELETE' })
+                            .then(res => res.json())
+                            .then(data => {
+                                if (data.success) {
+                                    Swal.fire('삭제 완료', '사용자가 삭제되었습니다.', 'success')
+                                        .then(() => location.reload());
+                                } else {
+                                    Swal.fire('실패', '사용자 삭제에 실패했습니다.', 'error');
+                                }
+                            })
+                            .catch(err => {
+                                Swal.fire('에러', '서버와의 통신에 실패했습니다.', 'error');
+                            });
+                    }
+                });
+            });
+        });
+    });
+</script>
