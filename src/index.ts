@@ -6,9 +6,10 @@ import methodOverride from 'method-override';
 import passport from 'passport';
 import { Strategy as LocalStrategy } from 'passport-local';
 import helmet from 'helmet';
-import mongoSanitize from 'express-mongo-sanitize';
-import flash from 'connect-flash';
 
+import flash from 'connect-flash';
+import User from './models/user';
+import mongoSanitize from 'express-mongo-sanitize';
 
 // import { connectToDatabase } from './database';
 
@@ -28,7 +29,21 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(methodOverride('_method'));
-app.use(mongoSanitize({ replaceWith: '_' }));
+
+// app.use(mongoSanitize({ replaceWith: '_' }));
+
+
+// To remove data using these defaults:
+// app.use(mongoSanitize());
+
+
+// app.use(mongoSanitize({
+//   replaceWith: '_',
+//   onSanitize: ({ req, key }) => {
+//     console.warn(`This request[${key}] is sanitized`, (req as any)[key]);
+//   }
+// }));
+
 
 const sessionConfig: session.SessionOptions = {
   secret: process.env.SESSION_SECRET_KEY || 'secret',
@@ -57,14 +72,18 @@ app.use(
   })
 );
 
-// app.use(passport.initialize());
+app.use(passport.initialize());
 app.use(passport.session());
 
-// passport.use(new LocalStrategy(User.authenticate()));
-// passport.serializeUser(User.serializeUser());
-// passport.deserializeUser(User.deserializeUser());
+passport.use(new LocalStrategy(User.authenticate()));
+passport.serializeUser(User.serializeUser());
+passport.deserializeUser(User.deserializeUser());
 
 app.use((req, res, next) => {
+  console.log('Session:', req.session);
+  console.log('User:', req.user);
+  console.log('Is Authenticated:', req.isAuthenticated());
+  
   res.locals.currentUser = req.user || null;
   res.locals.success = req.flash('success');
   res.locals.error = req.flash('error');
