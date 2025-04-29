@@ -18,6 +18,7 @@ import catchAsync from './utils/catchAsync';
 import ExpressError from './utils/ExpressError';
 
 import userRoutes from './routes/user';
+import noticeRoutes from './routes/notices';
 
 
 const app = express();
@@ -112,6 +113,7 @@ app.use((req, res, next) => {
 
 
 app.use('/', userRoutes);
+app.use('/notice', noticeRoutes);
 
 app.get('/', (req, res) => {
   res.render('home');
