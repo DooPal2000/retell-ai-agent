@@ -22,7 +22,6 @@
   "devDependencies": {
     "@types/connect-flash": "^0.0.40",
     "@types/express": "^5.0.1",
-    "@types/express-mongo-sanitize": "^2.1.2",
     "@types/express-session": "^1.18.1",
     "@types/helmet": "^4.0.0",
     "@types/jest": "^29.5.14",
