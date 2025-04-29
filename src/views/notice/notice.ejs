@@ -1,0 +1,88 @@
+<% layout('layouts/boilerplate') %>
+
+<div class="container mt-3">
+    <h1 class="text-center mb-4">상품 관리 페이지</h1>
+    <p>수량 버튼을 클릭할 시 자동 저장됩니다.<br><span style="color: red;">( 반드시 인터넷 연결 확인 )</span></p>
+    
+    <% products.forEach(product => { %>
+        <div class="card mb-3">
+            <div class="card-body">
+                <h5 class="card-title"><%= product.name %></h5>
+                <p class="card-text">가격: <%= product.price %>원</p>
+                <div class="input-group mb-3">
+                    <button class="btn btn-outline-secondary decrease-quantity" type="button" data-product-id="<%= product._id %>">-</button>
+                    <input type="text" class="form-control text-center quantity-input" value="<%= product.quantity %>" readonly>
+                    <button class="btn btn-outline-secondary increase-quantity" type="button" data-product-id="<%= product._id %>">+</button>
+                </div>
+                <div class="d-flex justify-content-end">
+                    <button class="btn btn-primary btn-sm manage-product" data-product-id="<%= product._id %>">
+                        상품관리
+                    </button>
+                </div>        
+    
+            </div>
+        </div>
+    <% }) %>
+
+    <div class="d-flex justify-content-end">
+        <a href="/products/new" class="btn btn-success" id="add-product">상품 추가</a>
+    </div>        
+
+    <div class="mt-4">
+    </div>
+</div>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        // 수량 증가 처리
+        document.querySelectorAll('.increase-quantity').forEach(button => {
+            button.addEventListener('click', function () {
+                const productId = this.dataset.productId;
+                const input = this.parentElement.querySelector('.quantity-input');
+                let quantity = parseInt(input.value, 10);
+                input.value = quantity + 1;
+                updateQuantity(productId, quantity + 1);
+            });
+        });
+
+        // 수량 감소 처리
+        document.querySelectorAll('.decrease-quantity').forEach(button => {
+            button.addEventListener('click', function () {
+                const productId = this.dataset.productId;
+                const input = this.parentElement.querySelector('.quantity-input');
+                let quantity = parseInt(input.value, 10);
+                if (quantity > 0) {
+                    input.value = quantity - 1;
+                    updateQuantity(productId, quantity - 1);
+                }
+            });
+        });
+
+        // 상품 관리 처리
+        document.querySelectorAll('.manage-product').forEach(button => {
+            button.addEventListener('click', function () {
+                const productId = this.dataset.productId;
+                // 상품 관리 페이지로 이동
+                window.location.href = `/products/${productId}/edit`;
+            });
+        });
+
+        function updateQuantity(productId, newQuantity) {
+            fetch(`/products/${productId}/update-quantity`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ quantity: newQuantity })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (!data.success) {
+                    console.error('수량 업데이트 실패');
+                }
+            })
+            .catch(error => {
+                console.error('에러:', error);
+            });
+        }
+    });
+</script>
