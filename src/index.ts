@@ -17,8 +17,16 @@ import config from './config';
 import catchAsync from './utils/catchAsync';
 import ExpressError from './utils/ExpressError';
 
-import userRoutes from './routes/user';
-import noticeRoutes from './routes/notices';
+// import userRoutes from './routes/userRoutes';
+// import noticeRoutes from './routes/notices';
+
+import userRoutes from './routes/userRoutes';
+import noticeRoutes from './routes/noticeRoutes';
+import callsRoutes from './routes/callsRoutes';
+import agentsRoutes from './routes/agentsRoutes';
+import llmRoutes from './routes/llmRoutes';
+import docsRoutes from './routes/docsRoutes';
+import dashboardRoutes from './routes/noticeRoutes';
 
 
 const app = express();
@@ -64,6 +72,9 @@ app.use(methodOverride('_method'));
 
 //   next();
 // });
+
+// 데이터베이스 연결
+connectToDatabase().catch(console.error);
 
 
 
@@ -112,8 +123,15 @@ app.use((req, res, next) => {
 });
 
 
-app.use('/', userRoutes);
 app.use('/notice', noticeRoutes);
+app.use('/calls/register', callsRoutes);
+app.use('/calls', callsRoutes);
+app.use('/agents', agentsRoutes);
+app.use('/llm', llmRoutes);
+app.use('/docs', docsRoutes);
+app.use('/dashboard', dashboardRoutes);
+app.use('/', userRoutes);
+
 
 app.get('/', (req, res) => {
   res.render('home');
@@ -128,9 +146,6 @@ app.use((err: any, req: Request, res: Response, next: NextFunction) => {
   if (!err.message) err.message = 'Oh No, Something Went Wrong!';
   res.status(statusCode).render('error', { err });
 });
-
-// 데이터베이스 연결
-connectToDatabase().catch(console.error);
 
 app.listen(3000, () => {
   console.log('Serving on port 3000');
