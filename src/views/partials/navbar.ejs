@@ -1,25 +1,25 @@
-<nav class="navbar sticky-top navbar-expand-lg" style="background-color: #54a8e3;">
+<nav class="navbar sticky-top navbar-expand-lg navbar-dark">
   <div class="container-fluid">
-    <a class="navbar-brand" href="/">For Your Agent</a>
+    <a class="navbar-brand fw-bold" href="/">For Your Agent</a>
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavAltMarkup"
       aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
     </button>
     <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
       <div class="navbar-nav me-auto">
-        <a class="nav-link fs-5 fw-semibold px-3" href="/calls/register">통화 등록</a>
-        <a class="nav-link fs-5 fw-semibold px-3" href="/calls">통화 목록</a>
-        <a class="nav-link fs-5 fw-semibold px-3" href="/agents">에이전트 관리</a>
-        <a class="nav-link fs-5 fw-semibold px-3" href="/agents">LLM 관리</a>
-        <a class="nav-link fs-5 fw-semibold px-3" href="/docs">API 문서</a>
-        <a class="nav-link fs-5 fw-semibold px-3" href="/notice">안내사항</a>
+        <a class="nav-link fs-5 fw-semibold px-3 nav-item" href="/calls/register">통화 등록</a>
+        <a class="nav-link fs-5 fw-semibold px-3 nav-item" href="/calls">통화 목록</a>
+        <a class="nav-link fs-5 fw-semibold px-3 nav-item" href="/agents">에이전트 관리</a>
+        <a class="nav-link fs-5 fw-semibold px-3 nav-item" href="/agents">LLM 관리</a>
+        <a class="nav-link fs-5 fw-semibold px-3 nav-item" href="/docs">API 문서</a>
+        <a class="nav-link fs-5 fw-semibold px-3 nav-item" href="/notice">안내사항</a>
       </div>
       <div class="navbar-nav ms-auto">
         <% if(typeof currentUser !=='undefined' && currentUser) { %>
-          <a class="nav-link" href="/logout">로그아웃</a>
+          <a class="nav-link btn-outline-light rounded-pill px-3 mx-2" href="/logout">로그아웃</a>
           <% } else { %>
-            <a class="nav-link" href="/login">로그인</a>
-            <a class="nav-link" href="/register">회원가입</a>
+            <a class="nav-link btn-outline-light rounded-pill px-3 mx-2" href="/login">로그인</a>
+            <a class="nav-link btn-outline-light rounded-pill px-3 mx-2" href="/register">회원가입</a>
             <% } %>
       </div>
     </div>
