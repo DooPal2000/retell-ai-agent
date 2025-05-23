@@ -1,0 +1,169 @@
+<% layout('layouts/boilerplate')%>
+<div class="container mt-3">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2>에이전트 관리</h2>
+                <a href="/agents/new" class="btn btn-primary">
+                    <i class="fas fa-plus"></i> 새 에이전트 생성
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <% if(agents && agents.length > 0) { %>
+            <% agents.forEach(function(agent) { %>
+                <div class="col-md-6 col-lg-4 mb-4">
+                    <div class="card shadow h-100">
+                        <div class="card-header d-flex justify-content-between align-items-center">
+                            <h6 class="card-title mb-0 text-truncate" title="<%= agent.agent_name %>">
+                                <%= agent.agent_name %>
+                            </h6>
+                            <span class="badge <%= agent.is_published ? 'bg-success' : 'bg-secondary' %>">
+                                <%= agent.is_published ? '배포됨' : '미배포' %>
+                            </span>
+                        </div>
+                        <div class="card-body">
+                            <div class="mb-2">
+                                <small class="text-muted">에이전트 ID:</small>
+                                <div class="font-monospace small text-break">
+                                    <%= agent.agent_id %>
+                                </div>
+                            </div>
+                            
+                            <div class="mb-2">
+                                <small class="text-muted">언어:</small>
+                                <span class="badge bg-info ms-1"><%= agent.language %></span>
+                            </div>
+                            
+                            <div class="mb-2">
+                                <small class="text-muted">음성:</small>
+                                <div><%= agent.voice_id %></div>
+                            </div>
+                            
+                            <div class="mb-2">
+                                <small class="text-muted">응답 엔진:</small>
+                                <div class="small">
+                                    <%= agent.response_engine.type %>
+                                    <% if(agent.response_engine.llm_id) { %>
+                                        <br><span class="text-muted">LLM: <%= agent.response_engine.llm_id %></span>
+                                    <% } %>
+                                </div>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <small class="text-muted">최대 통화 시간:</small>
+                                <div><%= Math.floor(agent.max_call_duration_ms / 60000) %>분</div>
+                            </div>
+                            
+                            <div class="mb-2">
+                                <small class="text-muted">마지막 수정:</small>
+                                <div class="small">
+                                    <%= new Date(agent.last_modification_timestamp).toLocaleString('ko-KR') %>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card-footer">
+                            <div class="btn-group w-100" role="group">
+                                <a href="/agents/<%= agent.agent_id %>" class="btn btn-outline-primary btn-sm">
+                                    <i class="fas fa-eye"></i> 보기
+                                </a>
+                                <a href="/agents/<%= agent.agent_id %>/edit" class="btn btn-outline-warning btn-sm">
+                                    <i class="fas fa-edit"></i> 수정
+                                </a>
+                                <button type="button" class="btn btn-outline-danger btn-sm" 
+                                        onclick="deleteAgent('<%= agent.agent_id %>')">
+                                    <i class="fas fa-trash"></i> 삭제
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            <% }); %>
+        <% } else { %>
+            <div class="col-12">
+                <div class="text-center py-5">
+                    <div class="mb-4">
+                        <i class="fas fa-robot fa-5x text-muted"></i>
+                    </div>
+                    <h4 class="text-muted">등록된 에이전트가 없습니다</h4>
+                    <p class="text-muted">첫 번째 AI 에이전트를 생성해보세요!</p>
+                    <a href="/agents/new" class="btn btn-primary">
+                        <i class="fas fa-plus"></i> 에이전트 생성하기
+                    </a>
+                </div>
+            </div>
+        <% } %>
+    </div>
+</div>
+
+<script>
+    async function deleteAgent(agentId) {
+        const result = await Swal.fire({
+            title: '에이전트 삭제',
+            text: '정말로 이 에이전트를 삭제하시겠습니까?',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#d33',
+            cancelButtonColor: '#3085d6',
+            confirmButtonText: '삭제',
+            cancelButtonText: '취소'
+        });
+
+        if (result.isConfirmed) {
+            try {
+                const response = await fetch(`/agents/${agentId}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    }
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    Swal.fire({
+                        title: '삭제 완료',
+                        text: '에이전트가 성공적으로 삭제되었습니다.',
+                        icon: 'success'
+                    }).then(() => {
+                        location.reload();
+                    });
+                } else {
+                    throw new Error(data.message || '삭제에 실패했습니다.');
+                }
+            } catch (error) {
+                Swal.fire({
+                    title: '삭제 실패',
+                    text: error.message,
+                    icon: 'error'
+                });
+            }
+        }
+    }
+</script>
+
+<% if(error && error.length) { %>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            Swal.fire({
+                icon: 'error',
+                title: '오류 발생',
+                text: '<%= error %>'
+            });
+        });
+    </script>
+<% } %>
+
+<% if(success && success.length) { %>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            Swal.fire({
+                icon: 'success',
+                title: '성공',
+                text: '<%= success %>'
+            });
+        });
+    </script>
+<% } %>

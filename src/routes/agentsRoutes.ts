@@ -4,20 +4,26 @@ import { Router } from 'express';
 
 import catchAsync from '../utils/catchAsync';
 // import { isLoggedIn, isSecureAdminCreation, isAuthorized, isRealPhone } from '../middleware';
-import * as users from '../controllers/Cusers';
+import * as agents from '../controllers/Cagent';
 
 const router: Router = express.Router();
 
-router.get('/register', users.renderRegister);
-router.get('/register/admin', users.renderRegisterAdmin);
+// Create Agent
+router.post('/', catchAsync(agents.createAgent));
 
-router.post('/register', catchAsync(users.register));
-router.post('/register/admin', catchAsync(users.registerAdmin));
+// Get Agent
+router.get('/:id', catchAsync(agents.getAgent));
 
-router.get('/login', users.renderLogin);
+// List Agents
+router.get('/', catchAsync(agents.listAgents));
 
-router.post('/login', users.login);
+// Update Agent
+router.patch('/:id', catchAsync(agents.updateAgent));
 
-router.get('/logout', users.logout);
+// Delete Agent
+router.delete('/:id', catchAsync(agents.deleteAgent));
 
-export default router; 
+// Get Agent Versions
+router.get('/:id/versions', catchAsync(agents.getAgentVersions));
+
+export default router;
