@@ -55,6 +55,7 @@ import json
 from dotenv import load_dotenv
 from bert_score import score
 from retell import Retell
+import re
 
 # .env 파일에서 환경 변수 로드
 load_dotenv()
@@ -96,6 +97,46 @@ def extract_turns_from_transcript(transcript: str):
 # 대화 턴 추출
 pairs_kb = extract_turns_from_transcript(transcript_kb)
 pairs_general = extract_turns_from_transcript(transcript_general)
+
+
+def remove_followup_question(answer: str) -> str:
+    """
+    Agent의 응답에서 후속 질문(예: '더 궁금하신가요?', '말씀해주세요!', '자세한 내용 원하시면~' 등)을 제거합니다.
+    다양한 변칙 패턴을 최대한 포괄하도록 구현.
+    """
+    # 1. 대표적인 정규식 패턴들 (확장 가능)
+    followup_patterns = [
+        r"(더|추가|자세|혹시|언제든지|필요).*?(궁금|문의|말씀|원하|도와드릴|알려).*?(있으신가요|있을까요|주세요|해 주세요|해주세요|부탁|원하시면|필요하시면)[.!]?",
+        r"(궁금한 점|궁금한 사항|문의사항|질문|알고 싶은 점).*?(있으신가요|있을까요|있으시면|있으면|있으시다면|있다면)[.!]?",
+        r"(언제든지|필요하시면|추가로|더).*?(문의|연락|말씀|알려).*?(주세요|해 주세요|해주세요)[.!]?",
+    ]
+    # 2. 문장 단위로 분리
+    sentences = re.split(r'(?<=[.!?])\s+', answer)
+    # 3. 각 문장별로 후속 질문 여부 확인
+    result_sentences = []
+    for sent in sentences:
+        sent_strip = sent.strip()
+        # 패턴에 한 번이라도 걸리면 해당 문장 삭제
+        if not any(re.search(pattern, sent_strip, re.IGNORECASE) for pattern in followup_patterns):
+            result_sentences.append(sent_strip)
+    # 4. 남은 문장만 다시 합치기
+    return ' '.join(result_sentences).strip()
+
+# cleaned_pairs_kb = []
+# for question, answer in pairs_kb:
+#     cleaned_answer = remove_followup_question(answer)
+#     cleaned_pairs_kb.append((question, cleaned_answer))
+
+# cleaned_pairs_general = []
+# for question, answer in pairs_kb:
+#     cleaned_answer = remove_followup_question(answer)
+#     cleaned_pairs_kb.append((question, cleaned_answer))
+
+# 후속 질문 제거된 쌍으로 새 리스트 생성
+# 윗줄과 비교 용도, 어느 게 더 파이썬스러운 배열인지 학습
+cleaned_pairs_kb = [(q, remove_followup_question(a)) for q, a in pairs_kb]
+cleaned_pairs_general = [(q, remove_followup_question(a)) for q, a in pairs_general]
+
 
 # # 비교를 위한 참조 응답 및 후보 응답 리스트 
 # reference = ["..."]
@@ -143,8 +184,8 @@ reference += [
 # # 결과: reference 리스트가 이제 모든 응답을 포함한 상태입니다.
 # print(reference)
 
-candidate_kb = [answer for _, answer in pairs_kb]
-candidate_general = [answer for _, answer in pairs_general]
+candidate_kb = [answer for _, answer in cleaned_pairs_kb]
+candidate_general = [answer for _, answer in cleaned_pairs_general]
 
 # 리스트 길이 맞추기
 min_len = min(len(reference), len(candidate_kb), len(candidate_general))
